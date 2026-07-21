@@ -41,13 +41,7 @@ function effectiveUseCase(shoe) {
 }
 
 function effectiveWidths(shoe) {
-  if (shoe.width_options?.length) return shoe.width_options;
-  const result = new Set(['standard']);
-  for (const c of shoe.categories) {
-    if (c === 'Wide/ High Instep fit') result.add('wide');
-    if (c === 'Narrow/ Low Instep fit') result.add('narrow');
-  }
-  return Array.from(result);
+  return shoe.width_options || [];
 }
 
 const EMPTY_FILTERS = {

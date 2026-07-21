@@ -21,10 +21,8 @@ const STABILITY_LEVELS = [
 ];
 
 const WIDTH_OPTIONS = [
-  { value: 'narrow',     label: 'Narrow' },
-  { value: 'standard',   label: 'Standard' },
-  { value: 'wide',       label: 'Wide' },
-  { value: 'extra_wide', label: '2E / 4E' },
+  { value: 'runs_narrow', label: 'Runs Narrow' },
+  { value: 'runs_wide',   label: 'Runs Wide / Toe Box' },
 ];
 
 const DROP_OPTIONS = [

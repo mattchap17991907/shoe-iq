@@ -9,10 +9,8 @@ const USE_CASE_OPTS = [
   { value: 'recovery',          label: 'Recovery' },
 ];
 const WIDTH_OPTS = [
-  { value: 'narrow',     label: 'Narrow (B)' },
-  { value: 'standard',   label: 'Standard (D)' },
-  { value: 'wide',       label: 'Wide (2E)' },
-  { value: 'extra_wide', label: 'Extra Wide (4E)' },
+  { value: 'runs_narrow', label: 'Runs Narrow' },
+  { value: 'runs_wide',   label: 'Runs Wide / Wide Toe Box' },
 ];
 
 function Chips({ options, selected, onToggle, single }) {
