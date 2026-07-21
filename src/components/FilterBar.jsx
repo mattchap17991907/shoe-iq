@@ -26,9 +26,8 @@ const WIDTH_OPTIONS = [
 ];
 
 const DROP_OPTIONS = [
-  { value: 'zero',     label: 'Zero drop' },
-  { value: 'low',      label: 'Low drop' },
-  { value: 'standard', label: 'Standard drop' },
+  { value: 'zero', label: 'Zero drop' },
+  { value: 'low',  label: 'Low drop' },
 ];
 
 const EMPTY_FILTERS = {

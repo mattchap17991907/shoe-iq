@@ -132,7 +132,7 @@ export default function AddShoePanel({ categories, onSave, onCancel }) {
           <div className="form-section">
             <label>Heel-to-toe drop</label>
             <Chips
-              options={['zero','low','standard'].map(v => ({ value: v, label: v.charAt(0).toUpperCase()+v.slice(1) }))}
+              options={['zero','low'].map(v => ({ value: v, label: v.charAt(0).toUpperCase()+v.slice(1) }))}
               selected={drop}
               onToggle={v => setDrop(p => toggleItem(p, v, true))}
             />
