@@ -4,6 +4,8 @@ const USE_CASES = [
   { value: 'track_xc',          label: 'Track / XC' },
   { value: 'walking_workplace', label: 'Walking / Workplace' },
   { value: 'recovery',          label: 'Recovery' },
+  { value: 'plated_speed',      label: 'Plated Speed' },
+  { value: 'non_plated_speed',  label: 'Non-Plated Speed' },
 ];
 
 const CUSHION_LEVELS = [
