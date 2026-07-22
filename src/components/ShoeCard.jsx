@@ -19,7 +19,7 @@ function resolveCushion(shoe) {
   return null;
 }
 
-export default function ShoeCard({ shoe, score, activeCategory, educationTips }) {
+export default function ShoeCard({ shoe, score, activeCategory, educationTips, dimmed }) {
   const [specs, setSpecs] = useState(shoe.specs || '');
   const [tipOpen, setTipOpen] = useState(false);
 
@@ -38,7 +38,7 @@ export default function ShoeCard({ shoe, score, activeCategory, educationTips })
     : educationTips.find(t => t.context === tipCtx);
 
   return (
-    <div className={`card${shoe.flagged ? ' flagged' : ''}`}>
+    <div className={`card${shoe.flagged ? ' flagged' : ''}${dimmed ? ' not-in-store' : ''}`}>
       {score != null && score > 0 && (
         <div className="match-score">{score} match{score === 1 ? '' : 'es'}</div>
       )}

@@ -94,7 +94,13 @@ export default function BrowsePanel({ shoes, categories, scanProfile, educationT
     });
   }, [shoes, scanProfile, filters]);
 
-  const label = `${filtered.length} shoe${filtered.length === 1 ? '' : 's'}${filters.category ? ` in "${filters.category}"` : ''}`;
+  const [showAll, setShowAll] = useState(false);
+
+  const inStoreCount = useMemo(() => shoes.filter(s => s.in_store !== false).length, [shoes]);
+
+  const displayList = showAll ? filtered : filtered.filter(s => s.in_store !== false);
+
+  const label = `${displayList.length} shoe${displayList.length === 1 ? '' : 's'}${filters.category ? ` in "${filters.category}"` : ''}`;
 
   return (
     <div className="panel">
@@ -116,19 +122,27 @@ export default function BrowsePanel({ shoes, categories, scanProfile, educationT
 
       <div className="count-row">
         <span className="count">{label}</span>
+        <button
+          className={`btn sm secondary inventory-toggle${showAll ? ' active' : ''}`}
+          onClick={() => setShowAll(v => !v)}
+          title={showAll ? 'Showing all shoes — click to show in-store only' : `Showing ${inStoreCount} in-store shoes — click to show all`}
+        >
+          {showAll ? 'Show in-store only' : 'Show all shoes'}
+        </button>
       </div>
 
-      {filtered.length === 0 ? (
+      {displayList.length === 0 ? (
         <div className="empty">No shoes match that filter combination. Try fewer filters or add the shoe via "+ Add new shoe."</div>
       ) : (
         <div className="grid">
-          {filtered.map(s => (
+          {displayList.map(s => (
             <ShoeCard
               key={s.id}
               shoe={s}
               score={s.score}
               activeCategory={filters.category}
               educationTips={educationTips}
+              dimmed={showAll && s.in_store === false}
             />
           ))}
         </div>

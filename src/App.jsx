@@ -153,6 +153,8 @@ export default function App() {
 
           {activeTab === 'manage' && (
             <ManageRules
+              shoes={shoes}
+              setShoes={setShoes}
               scanRules={scanRules}
               setScanRules={setScanRules}
               insertTriggers={insertTriggers}

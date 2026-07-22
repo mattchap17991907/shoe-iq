@@ -10,6 +10,7 @@ const FIELD_LABELS = {
 };
 
 export default function ManageRules({
+  shoes, setShoes,
   scanRules, setScanRules,
   insertTriggers, setInsertTriggers,
   painPointInserts, setPainPointInserts,
@@ -17,6 +18,26 @@ export default function ManageRules({
 }) {
   const [newRule, setNewRule]       = useState({ field: 'archHeight', value: '', category: '' });
   const [newTrigger, setNewTrigger] = useState({ key: '', label: '', insert_name: '', why: '' });
+  const [invSearch, setInvSearch]   = useState('');
+
+  // ── Store inventory ─────────────────────────────────────────────────────────
+
+  async function toggleInStore(shoe) {
+    const next = shoe.in_store === false ? true : false;
+    const { error } = await supabase.from('shoes').update({ in_store: next }).eq('id', shoe.id);
+    if (error) { alert('Could not update inventory: ' + error.message); return; }
+    setShoes(prev => prev.map(s => s.id === shoe.id ? { ...s, in_store: next } : s));
+  }
+
+  const invFiltered = (shoes || [])
+    .filter(s => {
+      if (!invSearch.trim()) return true;
+      const t = invSearch.toLowerCase();
+      return s.display.toLowerCase().includes(t) || s.brand.toLowerCase().includes(t);
+    })
+    .sort((a, b) => a.brand.localeCompare(b.brand) || a.display.localeCompare(b.display));
+
+  const inStoreCount = (shoes || []).filter(s => s.in_store !== false).length;
 
   // ── Scan rules ──────────────────────────────────────────────────────────────
 
@@ -73,6 +94,37 @@ export default function ManageRules({
         These tables drive the <strong>Start from a scan</strong> inference and the <strong>Insert finder</strong>.
         Staff-editable — get a fitter's sign-off before relying on changes here.
       </p>
+
+      {/* ── Store inventory ── */}
+      <section>
+        <h4>Store inventory <span className="inv-count">{inStoreCount} of {(shoes||[]).length} in store</span></h4>
+        <p className="panel-note" style={{ marginTop: 0 }}>
+          Toggle which shoes your store currently carries. Only in-store shoes appear in the Browse view by default.
+        </p>
+        <input
+          type="text"
+          placeholder="Search shoes…"
+          value={invSearch}
+          onChange={e => setInvSearch(e.target.value)}
+          style={{ marginBottom: 10 }}
+        />
+        <div className="inv-list">
+          {invFiltered.map(s => (
+            <div key={s.id} className={`inv-row${s.in_store === false ? ' inv-out' : ''}`}>
+              <span className="inv-name">
+                <span className="inv-brand">{s.brand}</span>
+                {s.display}
+              </span>
+              <button
+                className={`inv-toggle${s.in_store === false ? '' : ' in-store'}`}
+                onClick={() => toggleInStore(s)}
+              >
+                {s.in_store === false ? 'Not carried' : 'In store'}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* ── Scan rules ── */}
       <section>
