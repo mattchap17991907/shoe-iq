@@ -22,11 +22,12 @@ export default function App() {
   const [educationTips, setEducationTips] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [appUnlocked, setAppUnlocked] = useState(isPinUnlocked());
   const [activeTab, setActiveTab] = useState('browse');
   const [scanProfile, setScanProfile] = useState(null);
   const [pinModal, setPinModal] = useState(null); // null | { resolve: fn }
 
-  useEffect(() => { loadAll(); }, []);
+  useEffect(() => { if (appUnlocked) loadAll(); }, [appUnlocked]);
 
   async function loadAll() {
     setLoading(true);
@@ -77,6 +78,21 @@ export default function App() {
   function handleAddShoe(shoe) {
     setShoes(prev => [...prev, shoe].sort((a, b) => a.display.localeCompare(b.display)));
     setActiveTab('browse');
+  }
+
+  if (!appUnlocked) {
+    return (
+      <div className="wrap">
+        <header>
+          <div className="brand">
+            <h1>Shoe IQ</h1>
+            <p>Fleet Feet staff finder</p>
+          </div>
+        </header>
+        <div className="lane" />
+        <PinModal appLevel onResult={ok => { if (ok) setAppUnlocked(true); }} />
+      </div>
+    );
   }
 
   return (

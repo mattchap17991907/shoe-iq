@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { checkPin, setPinUnlocked } from '../lib/pin.js';
 
-export default function PinModal({ onResult }) {
+export default function PinModal({ onResult, appLevel = false }) {
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
   const inputRef = useRef(null);
@@ -21,14 +21,17 @@ export default function PinModal({ onResult }) {
 
   function handleKeyDown(e) {
     if (e.key === 'Enter') handleSubmit();
-    if (e.key === 'Escape') onResult(false);
+    if (e.key === 'Escape' && !appLevel) onResult(false);
   }
 
   return (
     <div className="pin-overlay">
       <div className="pin-box">
-        <h4>Staff PIN required</h4>
-        <p>Enter the staff PIN to add shoes or edit matching rules.</p>
+        <h4>{appLevel ? 'Shoe IQ — Staff Access' : 'Staff PIN required'}</h4>
+        <p>{appLevel
+          ? 'Enter the staff PIN to access Shoe IQ.'
+          : 'Enter the staff PIN to add shoes or edit matching rules.'
+        }</p>
         <input
           ref={inputRef}
           type="password"
@@ -39,7 +42,7 @@ export default function PinModal({ onResult }) {
           onKeyDown={handleKeyDown}
         />
         <div className="actions">
-          <button className="btn secondary" onClick={() => onResult(false)}>Cancel</button>
+          {!appLevel && <button className="btn secondary" onClick={() => onResult(false)}>Cancel</button>}
           <button className="btn" onClick={handleSubmit}>Unlock</button>
         </div>
         {error && <p className="pin-error">Incorrect PIN — try again.</p>}

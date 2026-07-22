@@ -530,8 +530,85 @@ label {
 .pin-box .actions { justify-content: flex-end; }
 .pin-error { color: var(--danger); font-size: 12px; margin: 8px 0 0; }
 
+/* ── Filter toggle (mobile only) ───────────────────────────────────────────── */
+.filter-toggle-btn {
+  display: none; /* hidden on desktop — shown via media query */
+  align-items: center; gap: 8px;
+  background: var(--chip); border: 1.5px solid var(--line);
+  border-radius: 8px; padding: 9px 14px;
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px;
+  color: var(--ink); cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  align-self: flex-start;
+}
+.filter-toggle-btn:hover { border-color: var(--track); }
+.filter-toggle-btn.open { background: var(--track-tint); border-color: var(--track); color: var(--track-dark); }
+.filter-toggle-badge {
+  background: var(--track); color: #fff;
+  font-size: 11px; font-weight: 700;
+  padding: 1px 7px; border-radius: 20px;
+}
+.filter-toggle-chevron { font-size: 10px; color: var(--ink-soft); }
+
 /* ── Footer ────────────────────────────────────────────────────────────────── */
 footer {
   margin-top: 36px; font-size: 12px;
   color: var(--ink-soft); text-align: center;
+}
+
+/* ── Responsive: tablet (≤768px) ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .wrap { padding: 16px 14px 60px; }
+
+  .brand h1 { font-size: 26px; }
+
+  .panel { padding: 16px 16px; }
+
+  /* Show filter toggle button, hide chip rows by default */
+  .filter-toggle-btn { display: flex; }
+  .filter-chips-body { display: none; flex-direction: column; gap: 10px; }
+  .filter-chips-body.open { display: flex; }
+
+  /* Stack search and category select vertically */
+  .filter-row-top { flex-direction: column; }
+  .filter-row-top input[type="text"],
+  .filter-row-top select { flex: none; width: 100%; min-width: unset; }
+
+  /* Bigger touch targets on chips */
+  .filter-chip { padding: 7px 14px; font-size: 12.5px; }
+
+  /* Grid: 2 columns on tablet */
+  .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+
+  /* Scan grid already has a 600px breakpoint, fine */
+
+  /* Insert layout already has a 700px breakpoint, fine */
+}
+
+/* ── Responsive: phone (≤480px) ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .wrap { padding: 12px 12px 50px; }
+
+  .brand h1 { font-size: 22px; }
+  .brand p { font-size: 11px; }
+
+  .panel { padding: 14px 14px; }
+
+  .tab { padding: 8px 11px 10px; font-size: 12.5px; }
+
+  /* Single column grid on phones */
+  .grid { grid-template-columns: 1fr; }
+
+  /* Shoe card adjustments */
+  .card { padding: 14px; }
+  .shoe-name { font-size: 16px; }
+
+  /* Stack form rows */
+  .form-row { grid-template-columns: 1fr; }
+
+  /* Pin box full width on small screens */
+  .pin-box { padding: 20px 18px; }
+
+  /* Scan profile preview */
+  .scan-profile-preview { padding: 14px 16px; }
 }

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const USE_CASES = [
   { value: 'road_running',      label: 'Road Running' },
   { value: 'trail_running',     label: 'Trail' },
@@ -36,6 +38,8 @@ const EMPTY_FILTERS = {
 };
 
 export default function FilterBar({ filters, categories, onChange }) {
+  const [chipsOpen, setChipsOpen] = useState(false);
+
   function toggle(field, value) {
     const cur = filters[field] || [];
     onChange({ ...filters, [field]: cur.includes(value) ? cur.filter(v => v !== value) : [...cur, value] });
@@ -45,11 +49,15 @@ export default function FilterBar({ filters, categories, onChange }) {
     return (filters[field] || []).includes(value);
   }
 
-  const hasActive = !!(
-    filters.search || filters.category ||
-    filters.useCase?.length || filters.cushionLevel?.length ||
-    filters.stabilityLevel?.length || filters.widthOptions?.length || filters.heelDrop?.length
+  const activeChipCount = (
+    (filters.useCase?.length || 0) +
+    (filters.cushionLevel?.length || 0) +
+    (filters.stabilityLevel?.length || 0) +
+    (filters.widthOptions?.length || 0) +
+    (filters.heelDrop?.length || 0)
   );
+
+  const hasActive = !!(filters.search || filters.category || activeChipCount);
 
   function ChipRow({ label, field, options }) {
     return (
@@ -83,19 +91,30 @@ export default function FilterBar({ filters, categories, onChange }) {
         </select>
       </div>
 
-      <ChipRow label="Use case"  field="useCase"        options={USE_CASES} />
-      <ChipRow label="Cushion"   field="cushionLevel"   options={CUSHION_LEVELS} />
-      <ChipRow label="Stability" field="stabilityLevel" options={STABILITY_LEVELS} />
-      <ChipRow label="Width"     field="widthOptions"   options={WIDTH_OPTIONS} />
-      <ChipRow label="Drop"      field="heelDrop"       options={DROP_OPTIONS} />
+      <button
+        className={`filter-toggle-btn${chipsOpen ? ' open' : ''}`}
+        onClick={() => setChipsOpen(o => !o)}
+      >
+        <span>Filters</span>
+        {activeChipCount > 0 && <span className="filter-toggle-badge">{activeChipCount}</span>}
+        <span className="filter-toggle-chevron">{chipsOpen ? '▲' : '▼'}</span>
+      </button>
 
-      {hasActive && (
-        <div className="filter-row">
-          <button className="btn secondary sm clear-filters" onClick={() => onChange(EMPTY_FILTERS)}>
-            Clear all filters
-          </button>
-        </div>
-      )}
+      <div className={`filter-chips-body${chipsOpen ? ' open' : ''}`}>
+        <ChipRow label="Use case"  field="useCase"        options={USE_CASES} />
+        <ChipRow label="Cushion"   field="cushionLevel"   options={CUSHION_LEVELS} />
+        <ChipRow label="Stability" field="stabilityLevel" options={STABILITY_LEVELS} />
+        <ChipRow label="Width"     field="widthOptions"   options={WIDTH_OPTIONS} />
+        <ChipRow label="Drop"      field="heelDrop"       options={DROP_OPTIONS} />
+
+        {hasActive && (
+          <div className="filter-row">
+            <button className="btn secondary sm clear-filters" onClick={() => { onChange(EMPTY_FILTERS); setChipsOpen(false); }}>
+              Clear all filters
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
