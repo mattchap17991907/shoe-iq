@@ -530,6 +530,26 @@ label {
 .pin-box .actions { justify-content: flex-end; }
 .pin-error { color: var(--danger); font-size: 12px; margin: 8px 0 0; }
 
+/* ── Store banner (header) ──────────────────────────────────────────────────── */
+.store-banner {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 5px;
+}
+.store-name {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+}
+.store-beta {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  background: #EEF0FF; color: #3040A0;
+  padding: 2px 9px; border-radius: 20px;
+}
+.store-tag {
+  font-size: 11px; font-weight: 600; color: var(--track-dark);
+  background: var(--track-tint); border-radius: 20px;
+  padding: 1px 9px; margin-left: 8px; vertical-align: middle;
+  font-family: 'Inter', sans-serif;
+}
+
 /* ── Count row inventory toggle ────────────────────────────────────────────── */
 .count-row { justify-content: space-between; }
 .inventory-toggle { margin-left: auto; }

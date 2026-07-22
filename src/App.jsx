@@ -22,6 +22,7 @@ export default function App() {
   const [educationTips, setEducationTips] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [activeStore, setActiveStore] = useState(null);
   const [appUnlocked, setAppUnlocked] = useState(isPinUnlocked());
   const [activeTab, setActiveTab] = useState('browse');
   const [scanProfile, setScanProfile] = useState(null);
@@ -31,7 +32,7 @@ export default function App() {
 
   async function loadAll() {
     setLoading(true);
-    const [catRes, shoeRes, ruleRes, triggerRes, colorRes, painRes, tipRes] = await Promise.all([
+    const [catRes, shoeRes, ruleRes, triggerRes, colorRes, painRes, tipRes, storeRes] = await Promise.all([
       supabase.from('categories').select('*').order('sort_order'),
       supabase.from('shoes').select('*').order('display'),
       supabase.from('scan_rules').select('*').order('sort_order'),
@@ -39,6 +40,7 @@ export default function App() {
       supabase.from('arch_color_map').select('*'),
       supabase.from('pain_point_inserts').select('*').order('sort_order'),
       supabase.from('education_tips').select('*').order('sort_order'),
+      supabase.from('stores').select('*').eq('pin', import.meta.env.VITE_STAFF_PIN).maybeSingle(),
     ]);
 
     setCategories(catRes.data || []);
@@ -50,6 +52,7 @@ export default function App() {
     setArchColorMap(colorMap);
     setPainPointInserts(painRes.data || []);
     setEducationTips(tipRes.data || []);
+    setActiveStore(storeRes.data || null);
     setLoading(false);
   }
 
@@ -102,6 +105,12 @@ export default function App() {
           <h1>Shoe IQ</h1>
           <p>Fleet Feet staff finder</p>
         </div>
+        {activeStore && (
+          <div className="store-banner">
+            <span className="store-name">{activeStore.name} — {activeStore.city}, {activeStore.state}</span>
+            <span className="store-beta">Multi-store β</span>
+          </div>
+        )}
       </header>
       <div className="lane" />
 
@@ -155,6 +164,7 @@ export default function App() {
             <ManageRules
               shoes={shoes}
               setShoes={setShoes}
+              activeStore={activeStore}
               scanRules={scanRules}
               setScanRules={setScanRules}
               insertTriggers={insertTriggers}
@@ -167,7 +177,10 @@ export default function App() {
         </>
       )}
 
-      <footer>Synced live via Supabase — shared across every device signed into this store's Shoe IQ.</footer>
+      <footer>
+        Synced live via Supabase — shared across every device at this store.
+        {activeStore && <> · <strong>{activeStore.name} {activeStore.city}</strong></>}
+      </footer>
 
       {pinModal && <PinModal onResult={handlePinResult} />}
     </div>

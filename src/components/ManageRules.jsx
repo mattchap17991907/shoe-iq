@@ -11,6 +11,7 @@ const FIELD_LABELS = {
 
 export default function ManageRules({
   shoes, setShoes,
+  activeStore,
   scanRules, setScanRules,
   insertTriggers, setInsertTriggers,
   painPointInserts, setPainPointInserts,
@@ -97,9 +98,13 @@ export default function ManageRules({
 
       {/* ── Store inventory ── */}
       <section>
-        <h4>Store inventory <span className="inv-count">{inStoreCount} of {(shoes||[]).length} in store</span></h4>
+        <h4>
+          Store inventory
+          {activeStore && <span className="store-tag">{activeStore.city}, {activeStore.state}</span>}
+          <span className="inv-count">{inStoreCount} of {(shoes||[]).length} in store</span>
+        </h4>
         <p className="panel-note" style={{ marginTop: 0 }}>
-          Toggle which shoes your store currently carries. Only in-store shoes appear in the Browse view by default.
+          Toggle which shoes this store currently carries. Only in-store shoes appear in the Browse view by default.
         </p>
         <input
           type="text"
