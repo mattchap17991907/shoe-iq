@@ -566,6 +566,29 @@ label {
 }
 .analytics-empty { font-size: 13px; color: var(--ink-soft); margin: 0; }
 
+.date-filter {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.date-filter-btn {
+  padding: 5px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.date-filter-btn:hover { border-color: var(--track); color: var(--track); }
+.date-filter-btn.active {
+  background: var(--track);
+  border-color: var(--track);
+  color: #fff;
+}
+
 .bar-list { display: flex; flex-direction: column; gap: 8px; }
 .bar-row {
   display: flex; align-items: center; gap: 10px;

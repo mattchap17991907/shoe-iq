@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient.js';
 
+const RANGES = [
+  { id: '7d',  label: 'This week' },
+  { id: '30d', label: 'This month' },
+  { id: 'all', label: 'All time' },
+];
+
 function StatCard({ label, value, sub }) {
   return (
     <div className="stat-card">
@@ -39,6 +45,7 @@ function BarList({ title, rows, maxCount }) {
 export default function AnalyticsPanel({ activeStore }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState('all');
 
   useEffect(() => { loadEvents(); }, [activeStore]);
 
@@ -55,11 +62,17 @@ export default function AnalyticsPanel({ activeStore }) {
     setLoading(false);
   }
 
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const thisWeek = events.filter(e => new Date(e.created_at) > weekAgo).length;
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const cutoffMs = { '7d': 7 * DAY_MS, '30d': 30 * DAY_MS };
+
+  const filteredEvents = dateRange === 'all'
+    ? events
+    : events.filter(e => new Date(e.created_at) > new Date(Date.now() - cutoffMs[dateRange]));
+
+  const rangeSub = { '7d': 'last 7 days', '30d': 'last 30 days', 'all': 'all time' }[dateRange];
 
   const tagCounts = {};
-  events.forEach(e => {
+  filteredEvents.forEach(e => {
     (e.event_data?.categories || []).forEach(cat => {
       tagCounts[cat] = (tagCounts[cat] || 0) + 1;
     });
@@ -67,14 +80,14 @@ export default function AnalyticsPanel({ activeStore }) {
   const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
   const shoeCounts = {};
-  events.forEach(e => {
+  filteredEvents.forEach(e => {
     (e.event_data?.matched_shoes || []).forEach(shoe => {
       shoeCounts[shoe] = (shoeCounts[shoe] || 0) + 1;
     });
   });
   const topShoes = Object.entries(shoeCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
-  const cushionCounts = events.reduce((acc, e) => {
+  const cushionCounts = filteredEvents.reduce((acc, e) => {
     const c = e.event_data?.cushion;
     if (c) acc[c] = (acc[c] || 0) + 1;
     return acc;
@@ -89,6 +102,18 @@ export default function AnalyticsPanel({ activeStore }) {
         {activeStore && <span className="store-tag">{activeStore.city}, {activeStore.state}</span>}
       </div>
 
+      <div className="date-filter">
+        {RANGES.map(r => (
+          <button
+            key={r.id}
+            className={`date-filter-btn${dateRange === r.id ? ' active' : ''}`}
+            onClick={() => setDateRange(r.id)}
+          >
+            {r.label}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div className="loading" style={{ padding: '40px 0' }}>Loading analytics…</div>
       ) : (
@@ -96,18 +121,18 @@ export default function AnalyticsPanel({ activeStore }) {
           <div className="stat-row">
             <StatCard
               label="Total scans"
-              value={events.length}
-              sub="all time"
-            />
-            <StatCard
-              label="This week"
-              value={thisWeek}
-              sub="last 7 days"
+              value={filteredEvents.length}
+              sub={rangeSub}
             />
             <StatCard
               label="Top cushion need"
               value={topCushion ? topCushion[0].charAt(0).toUpperCase() + topCushion[0].slice(1) : '—'}
               sub={topCushion ? `${topCushion[1]} scan${topCushion[1] === 1 ? '' : 's'}` : 'no data yet'}
+            />
+            <StatCard
+              label="Unique shoe types"
+              value={Object.keys(shoeCounts).length || '—'}
+              sub="appeared in results"
             />
           </div>
 
@@ -123,9 +148,11 @@ export default function AnalyticsPanel({ activeStore }) {
             maxCount={topShoes[0]?.[1] || 1}
           />
 
-          {events.length === 0 && (
+          {filteredEvents.length === 0 && (
             <p className="analytics-empty" style={{ textAlign: 'center', marginTop: 8 }}>
-              Run your first scan to start seeing data here.
+              {dateRange === 'all'
+                ? 'Run your first scan to start seeing data here.'
+                : `No scans recorded in the ${rangeSub}.`}
             </p>
           )}
         </>
