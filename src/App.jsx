@@ -76,6 +76,10 @@ export default function App() {
     return new Promise(resolve => setPinModal({ resolve }));
   }
 
+  function forceRequirePin() {
+    return new Promise(resolve => setPinModal({ resolve }));
+  }
+
   async function handleTabClick(tabName) {
     if (PIN_GATED.has(tabName)) {
       const ok = await requirePin();
@@ -166,7 +170,7 @@ export default function App() {
               storeNotes={storeNotes}
               onClearScan={() => setScanProfile(null)}
               onGoToScan={() => setActiveTab('scan')}
-              onRequirePin={requirePin}
+              onRequirePin={forceRequirePin}
             />
           )}
 
