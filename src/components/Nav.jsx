@@ -5,6 +5,7 @@ const TABS = [
   { id: 'checklist', label: 'Consultation checklist' },
   { id: 'add',       label: '+ Add new shoe' },
   { id: 'manage',    label: 'Manage rules' },
+  { id: 'analytics', label: '📊 Analytics' },
 ];
 
 export default function Nav({ activeTab, onTabClick }) {

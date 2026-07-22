@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabaseClient.js';
 import { isPinUnlocked } from './lib/pin.js';
+import { logEvent } from './lib/analytics.js';
 import Nav from './components/Nav.jsx';
 import PinModal from './components/PinModal.jsx';
 import ConsultationChecklist from './components/ConsultationChecklist.jsx';
@@ -9,8 +10,9 @@ import BrowsePanel from './components/BrowsePanel.jsx';
 import InsertFinder from './components/InsertFinder.jsx';
 import AddShoePanel from './components/AddShoePanel.jsx';
 import ManageRules from './components/ManageRules.jsx';
+import AnalyticsPanel from './components/AnalyticsPanel.jsx';
 
-const PIN_GATED = new Set(['add', 'manage']);
+const PIN_GATED = new Set(['add', 'manage', 'analytics']);
 
 export default function App() {
   const [shoes, setShoes] = useState([]);
@@ -76,6 +78,17 @@ export default function App() {
   function handleScanComplete(profile) {
     setScanProfile(profile);
     setActiveTab('browse');
+    const matchedShoes = shoes
+      .filter(s => s.in_store !== false)
+      .filter(s => (s.categories || []).some(c => profile.categories.includes(c)))
+      .map(s => s.display);
+    logEvent(activeStore?.id, 'scan_completed', {
+      categories: profile.categories,
+      cushion: profile.cushion,
+      stability: profile.stability,
+      matched_shoe_count: matchedShoes.length,
+      matched_shoes: matchedShoes,
+    });
   }
 
   function handleAddShoe(shoe) {
@@ -158,6 +171,10 @@ export default function App() {
               onSave={handleAddShoe}
               onCancel={() => setActiveTab('browse')}
             />
+          )}
+
+          {activeTab === 'analytics' && (
+            <AnalyticsPanel activeStore={activeStore} />
           )}
 
           {activeTab === 'manage' && (
