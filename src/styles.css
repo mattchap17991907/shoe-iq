@@ -291,6 +291,47 @@ label {
   font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.5px; margin-top: 4px;
 }
+.specs-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+.spec-field-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+}
+.spec-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 3px 0;
+}
+.spec-input, .spec-select {
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: 5px;
+  padding: 3px 6px;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.spec-input:focus, .spec-select:focus {
+  outline: none;
+  border-color: var(--track);
+}
+.spec-input::placeholder { color: var(--ink-soft); }
 
 /* ── Education tip on shoe card ────────────────────────────────────────────── */
 .education-tip-wrapper { margin-top: 6px; }
