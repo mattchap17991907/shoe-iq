@@ -49,7 +49,7 @@ const EMPTY_FILTERS = {
   useCase: [], cushionLevel: [], stabilityLevel: [], widthOptions: [], heelDrop: [],
 };
 
-export default function BrowsePanel({ shoes, categories, scanProfile, educationTips, storeNotes, onClearScan, onGoToScan }) {
+export default function BrowsePanel({ shoes, categories, scanProfile, educationTips, storeNotes, onClearScan, onGoToScan, onRequirePin }) {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
   const filtered = useMemo(() => {
@@ -144,6 +144,7 @@ export default function BrowsePanel({ shoes, categories, scanProfile, educationT
               educationTips={educationTips}
               featureNotes={storeNotes?.[s.id] || s.feature_notes || null}
               dimmed={showAll && s.in_store === false}
+              onRequirePin={onRequirePin}
             />
           ))}
         </div>

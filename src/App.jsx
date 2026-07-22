@@ -166,6 +166,7 @@ export default function App() {
               storeNotes={storeNotes}
               onClearScan={() => setScanProfile(null)}
               onGoToScan={() => setActiveTab('scan')}
+              onRequirePin={requirePin}
             />
           )}
 

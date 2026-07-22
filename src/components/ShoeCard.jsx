@@ -7,14 +7,8 @@ const CAT_TO_CUSHION   = { 'High Coushin': 'high', 'Soft Coushin': 'high', 'Low 
 const TIP_BY_STABILITY = { structured: 'stability_structured', neutral: 'stability_neutral', guidance: 'stability_guidance' };
 const TIP_BY_CUSHION   = { high: 'cushion_high', medium: 'cushion_medium', low: 'cushion_low' };
 
-const DROP_LABELS = { zero: '0 mm', low: 'Low', standard: 'Standard' };
-
-const FOAM_OPTIONS = [
-  { value: '',           label: '—' },
-  { value: 'responsive', label: 'Responsive' },
-  { value: 'plush',      label: 'Plush' },
-  { value: 'firm',       label: 'Firm' },
-];
+const DROP_LABELS  = { zero: '0 mm', low: 'Low', standard: 'Standard' };
+const FOAM_LABELS  = { 1: 'Firm', 2: 'Medium-Firm', 3: 'Medium', 4: 'Soft', 5: 'Plush' };
 
 function resolveStability(shoe) {
   if (shoe.stability_level) return shoe.stability_level;
@@ -28,26 +22,38 @@ function resolveCushion(shoe) {
   return null;
 }
 
-export default function ShoeCard({ shoe, score, activeCategory, educationTips, featureNotes, dimmed }) {
-  const [weight,   setWeight]   = useState(shoe.weight    || '');
-  const [foamFeel, setFoamFeel] = useState(shoe.foam_feel || '');
-  const [tipOpen,  setTipOpen]  = useState(false);
+export default function ShoeCard({ shoe, score, activeCategory, educationTips, featureNotes, dimmed, onRequirePin }) {
+  const [weight,         setWeight]         = useState(shoe.weight         || '');
+  const [foamScore,      setFoamScore]      = useState(shoe.foam_score     ?? null);
+  const [foamResponsive, setFoamResponsive] = useState(shoe.foam_responsive ?? false);
+  const [editMode,       setEditMode]       = useState(false);
+  const [tipOpen,        setTipOpen]        = useState(false);
+
+  async function handleEditSpecs() {
+    const ok = await onRequirePin();
+    if (ok) setEditMode(true);
+  }
 
   async function saveWeight(val) {
     const { error } = await supabase.from('shoes').update({ weight: val }).eq('id', shoe.id);
     if (error) console.error('Failed to save weight:', error.message);
   }
 
-  async function saveFoam(val) {
-    const { error } = await supabase.from('shoes').update({ foam_feel: val }).eq('id', shoe.id);
-    if (error) console.error('Failed to save foam feel:', error.message);
+  async function handleFoamDot(i) {
+    const next = foamScore === i ? null : i;
+    setFoamScore(next);
+    await supabase.from('shoes').update({ foam_score: next }).eq('id', shoe.id);
+  }
+
+  async function handleFoamResponsive(val) {
+    setFoamResponsive(val);
+    await supabase.from('shoes').update({ foam_responsive: val }).eq('id', shoe.id);
   }
 
   const stability = resolveStability(shoe);
   const cushion   = resolveCushion(shoe);
-
-  const tipCtx = TIP_BY_STABILITY[stability] || TIP_BY_CUSHION[cushion];
-  const tip    = shoe.education_tip
+  const tipCtx    = TIP_BY_STABILITY[stability] || TIP_BY_CUSHION[cushion];
+  const tip       = shoe.education_tip
     ? { tip: shoe.education_tip }
     : educationTips.find(t => t.context === tipCtx);
 
@@ -63,9 +69,7 @@ export default function ShoeCard({ shoe, score, activeCategory, educationTips, f
       <div className="shoe-name">{shoe.display}</div>
       {shoe.brand && <div className="brand-name">{shoe.brand}</div>}
       {shoe.flagged && (
-        <div className="flag-badge" title={shoe.flag_reason || 'Needs a data review'}>
-          ⚠ Needs review
-        </div>
+        <div className="flag-badge" title={shoe.flag_reason || 'Needs a data review'}>⚠ Needs review</div>
       )}
       <div className="tags">
         {(shoe.categories || []).map(c => (
@@ -73,33 +77,64 @@ export default function ShoeCard({ shoe, score, activeCategory, educationTips, f
         ))}
       </div>
 
-      <div className="specs-label">Specs</div>
+      <div className="specs-label">
+        Specs
+        {editMode
+          ? <button className="edit-specs-btn done" onClick={() => setEditMode(false)}>Done</button>
+          : <button className="edit-specs-btn" onClick={handleEditSpecs} title="Edit specs">✎</button>
+        }
+      </div>
+
       <div className="specs-row">
+        {/* Drop — always read-only, managed via taxonomy */}
         <div className="spec-item">
           <span className="spec-field-label">Drop</span>
           <span className="spec-value">{dropLabel}</span>
         </div>
+
+        {/* Weight */}
         <div className="spec-item">
           <span className="spec-field-label">Weight</span>
-          <input
-            className="spec-input"
-            placeholder="e.g. 8.4 oz"
-            value={weight}
-            onChange={e => setWeight(e.target.value)}
-            onBlur={e => saveWeight(e.target.value)}
-          />
+          {editMode
+            ? <input
+                className="spec-input"
+                placeholder="e.g. 8.4 oz"
+                value={weight}
+                onChange={e => setWeight(e.target.value)}
+                onBlur={e => saveWeight(e.target.value)}
+              />
+            : <span className="spec-value">{weight || '—'}</span>
+          }
         </div>
-        <div className="spec-item">
-          <span className="spec-field-label">Foam</span>
-          <select
-            className="spec-select"
-            value={foamFeel}
-            onChange={e => { setFoamFeel(e.target.value); saveFoam(e.target.value); }}
-          >
-            {FOAM_OPTIONS.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+
+        {/* Foam feel bar */}
+        <div className="spec-item foam-item">
+          <span className="spec-field-label">Foam feel</span>
+          <div className="foam-bar">
+            {[1,2,3,4,5].map(i =>
+              editMode
+                ? <button key={i} className={`foam-dot${(foamScore || 0) >= i ? ' filled' : ''}`} onClick={() => handleFoamDot(i)} />
+                : <span    key={i} className={`foam-dot${(foamScore || 0) >= i ? ' filled' : ''}`} />
+            )}
+            {foamResponsive && !editMode && <span className="foam-badge" title="Responsive foam">⚡</span>}
+          </div>
+          {(foamScore || foamResponsive) && (
+            <div className="foam-meta">
+              {foamScore && <span className="foam-label">{FOAM_LABELS[foamScore]}</span>}
+              {foamResponsive && foamScore && <span className="foam-sep">·</span>}
+              {foamResponsive && <span className="foam-label">Responsive</span>}
+            </div>
+          )}
+          {editMode && (
+            <label className="foam-responsive-label">
+              <input
+                type="checkbox"
+                checked={foamResponsive}
+                onChange={e => handleFoamResponsive(e.target.checked)}
+              />
+              ⚡ Responsive
+            </label>
+          )}
         </div>
       </div>
 

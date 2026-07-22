@@ -333,6 +333,60 @@ label {
 }
 .spec-input::placeholder { color: var(--ink-soft); }
 
+/* ── Edit specs button ──────────────────────────────────────────────────────── */
+.edit-specs-btn {
+  background: none;
+  border: none;
+  padding: 1px 5px;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ink-soft);
+  border-radius: 3px;
+  transition: color 0.15s, background 0.15s;
+  vertical-align: middle;
+}
+.edit-specs-btn:hover { color: var(--track); background: var(--track-tint); }
+.edit-specs-btn.done { color: var(--good); font-weight: 700; font-size: 11px; }
+
+/* ── Foam feel bar ──────────────────────────────────────────────────────────── */
+.foam-item { min-width: 0; }
+.foam-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+.foam-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--line);
+  border: none; padding: 0;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.foam-dot.filled { background: var(--track); }
+button.foam-dot { cursor: pointer; transition: transform 0.1s; }
+button.foam-dot:hover { transform: scale(1.25); }
+.foam-badge { font-size: 12px; margin-left: 2px; }
+.foam-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+.foam-label { font-size: 11px; color: var(--ink-soft); }
+.foam-sep   { font-size: 11px; color: var(--ink-soft); }
+.foam-responsive-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  cursor: pointer;
+}
+
 /* ── Education tip on shoe card ────────────────────────────────────────────── */
 .education-tip-wrapper { margin-top: 6px; }
 .education-tip-toggle {
