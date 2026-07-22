@@ -25,6 +25,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   const [activeStore, setActiveStore] = useState(null);
+  const [storeNotes, setStoreNotes] = useState({});
   const [appUnlocked, setAppUnlocked] = useState(isPinUnlocked());
   const [activeTab, setActiveTab] = useState('browse');
   const [scanProfile, setScanProfile] = useState(null);
@@ -54,7 +55,19 @@ export default function App() {
     setArchColorMap(colorMap);
     setPainPointInserts(painRes.data || []);
     setEducationTips(tipRes.data || []);
-    setActiveStore(storeRes.data || null);
+    const store = storeRes.data || null;
+    setActiveStore(store);
+
+    if (store) {
+      const { data: notesData } = await supabase
+        .from('shoe_feature_notes')
+        .select('shoe_id, notes')
+        .eq('store_id', store.id);
+      const map = {};
+      (notesData || []).forEach(row => { map[row.shoe_id] = row.notes; });
+      setStoreNotes(map);
+    }
+
     setLoading(false);
   }
 
@@ -150,6 +163,7 @@ export default function App() {
               categories={categories}
               scanProfile={scanProfile}
               educationTips={educationTips}
+              storeNotes={storeNotes}
               onClearScan={() => setScanProfile(null)}
               onGoToScan={() => setActiveTab('scan')}
             />
@@ -182,6 +196,8 @@ export default function App() {
               shoes={shoes}
               setShoes={setShoes}
               activeStore={activeStore}
+              storeNotes={storeNotes}
+              setStoreNotes={setStoreNotes}
               scanRules={scanRules}
               setScanRules={setScanRules}
               insertTriggers={insertTriggers}

@@ -19,7 +19,7 @@ function resolveCushion(shoe) {
   return null;
 }
 
-export default function ShoeCard({ shoe, score, activeCategory, educationTips, dimmed }) {
+export default function ShoeCard({ shoe, score, activeCategory, educationTips, featureNotes, dimmed }) {
   const [specs, setSpecs] = useState(shoe.specs || '');
   const [tipOpen, setTipOpen] = useState(false);
 
@@ -36,6 +36,8 @@ export default function ShoeCard({ shoe, score, activeCategory, educationTips, d
   const tip    = shoe.education_tip
     ? { tip: shoe.education_tip }
     : educationTips.find(t => t.context === tipCtx);
+
+  const lightbulbContent = featureNotes || tip?.tip;
 
   return (
     <div className={`card${shoe.flagged ? ' flagged' : ''}${dimmed ? ' not-in-store' : ''}`}>
@@ -62,12 +64,12 @@ export default function ShoeCard({ shoe, score, activeCategory, educationTips, d
         onChange={e => setSpecs(e.target.value)}
         onBlur={handleBlur}
       />
-      {tip && (
+      {lightbulbContent && (
         <div className="education-tip-wrapper">
           <button className="education-tip-toggle" onClick={() => setTipOpen(v => !v)}>
             <span>💡</span> Why it works {tipOpen ? '▲' : '▼'}
           </button>
-          {tipOpen && <div className="education-tip-body">{tip.tip}</div>}
+          {tipOpen && <div className="education-tip-body">{lightbulbContent}</div>}
         </div>
       )}
     </div>

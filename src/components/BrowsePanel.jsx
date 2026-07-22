@@ -49,7 +49,7 @@ const EMPTY_FILTERS = {
   useCase: [], cushionLevel: [], stabilityLevel: [], widthOptions: [], heelDrop: [],
 };
 
-export default function BrowsePanel({ shoes, categories, scanProfile, educationTips, onClearScan, onGoToScan }) {
+export default function BrowsePanel({ shoes, categories, scanProfile, educationTips, storeNotes, onClearScan, onGoToScan }) {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
   const filtered = useMemo(() => {
@@ -142,6 +142,7 @@ export default function BrowsePanel({ shoes, categories, scanProfile, educationT
               score={s.score}
               activeCategory={filters.category}
               educationTips={educationTips}
+              featureNotes={storeNotes?.[s.id] || s.feature_notes || null}
               dimmed={showAll && s.in_store === false}
             />
           ))}

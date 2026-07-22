@@ -12,6 +12,7 @@ const FIELD_LABELS = {
 export default function ManageRules({
   shoes, setShoes,
   activeStore,
+  storeNotes, setStoreNotes,
   scanRules, setScanRules,
   insertTriggers, setInsertTriggers,
   painPointInserts, setPainPointInserts,
@@ -20,6 +21,8 @@ export default function ManageRules({
   const [newRule, setNewRule]       = useState({ field: 'archHeight', value: '', category: '' });
   const [newTrigger, setNewTrigger] = useState({ key: '', label: '', insert_name: '', why: '' });
   const [invSearch, setInvSearch]   = useState('');
+  const [notesSearch, setNotesSearch] = useState('');
+  const [editingNotes, setEditingNotes] = useState({});
 
   // ── Store inventory ─────────────────────────────────────────────────────────
 
@@ -77,6 +80,29 @@ export default function ManageRules({
     setNewTrigger({ key: '', label: '', insert_name: '', why: '' });
   }
 
+  // ── Feature notes ───────────────────────────────────────────────────────────
+
+  function getNoteValue(shoeId) {
+    return editingNotes[shoeId] !== undefined ? editingNotes[shoeId] : (storeNotes?.[shoeId] || '');
+  }
+
+  async function saveNote(shoe) {
+    if (!activeStore) return;
+    const notes = getNoteValue(shoe.id);
+    const { error } = await supabase.from('shoe_feature_notes')
+      .upsert({ shoe_id: shoe.id, store_id: activeStore.id, notes }, { onConflict: 'shoe_id,store_id' });
+    if (error) { console.error('Could not save note:', error.message); return; }
+    setStoreNotes(prev => ({ ...prev, [shoe.id]: notes }));
+  }
+
+  const notesFiltered = (shoes || [])
+    .filter(s => {
+      if (!notesSearch.trim()) return true;
+      const t = notesSearch.toLowerCase();
+      return s.display.toLowerCase().includes(t) || (s.brand || '').toLowerCase().includes(t);
+    })
+    .sort((a, b) => a.brand.localeCompare(b.brand) || a.display.localeCompare(b.display));
+
   // ── Pain-point inserts ──────────────────────────────────────────────────────
 
   async function deletePainPoint(id) {
@@ -126,6 +152,41 @@ export default function ManageRules({
               >
                 {s.in_store === false ? 'Not carried' : 'In store'}
               </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Feature notes ── */}
+      <section>
+        <h4>
+          Feature notes — outfitter callouts
+          {activeStore && <span className="store-tag">{activeStore.city}, {activeStore.state}</span>}
+        </h4>
+        <p className="panel-note" style={{ marginTop: 0 }}>
+          Shoe-specific talking points shown in the 💡 lightbulb on every card. Written in your store's voice — other stores keep their own.
+        </p>
+        <input
+          type="text"
+          placeholder="Search shoes…"
+          value={notesSearch}
+          onChange={e => setNotesSearch(e.target.value)}
+          style={{ marginBottom: 10 }}
+        />
+        <div className="notes-list">
+          {notesFiltered.map(s => (
+            <div key={s.id} className="notes-row">
+              <div className="notes-shoe-label">
+                <span className="inv-brand">{s.brand}</span> {s.display}
+              </div>
+              <textarea
+                className="notes-textarea"
+                placeholder="e.g. Fulcrum technology delivers inherent stability with a durable outsole built for long days."
+                value={getNoteValue(s.id)}
+                onChange={e => setEditingNotes(p => ({ ...p, [s.id]: e.target.value }))}
+                onBlur={() => saveNote(s)}
+                rows={2}
+              />
             </div>
           ))}
         </div>
