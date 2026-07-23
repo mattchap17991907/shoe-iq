@@ -7,7 +7,11 @@ const CAT_TO_CUSHION   = { 'High Coushin': 'high', 'Soft Coushin': 'high', 'Low 
 const TIP_BY_STABILITY = { structured: 'stability_structured', neutral: 'stability_neutral', guidance: 'stability_guidance' };
 const TIP_BY_CUSHION   = { high: 'cushion_high', medium: 'cushion_medium', low: 'cushion_low' };
 
-const DROP_LABELS  = { zero: '0 mm', low: 'Low', standard: 'Standard' };
+function getDropLabel(d) {
+  if (!d) return '—';
+  if (d.includes('mm')) return d;
+  return { zero: '0 mm', low: 'Low', standard: 'Standard' }[d] ?? d;
+}
 const FOAM_LABELS  = { 1: 'Firm', 2: 'Medium-Firm', 3: 'Medium', 4: 'Soft', 5: 'Plush' };
 
 function resolveStability(shoe) {
@@ -58,7 +62,7 @@ export default function ShoeCard({ shoe, score, activeCategory, educationTips, f
     : educationTips.find(t => t.context === tipCtx);
 
   const lightbulbContent = featureNotes || tip?.tip;
-  const dropLabel = DROP_LABELS[shoe.heel_drop] || '—';
+  const dropLabel = getDropLabel(shoe.heel_drop);
 
   return (
     <div className={`card${shoe.flagged ? ' flagged' : ''}${dimmed ? ' not-in-store' : ''}`}>

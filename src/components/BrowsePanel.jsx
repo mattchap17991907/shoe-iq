@@ -44,6 +44,18 @@ function effectiveWidths(shoe) {
   return shoe.width_options || [];
 }
 
+function dropCategory(val) {
+  if (!val) return null;
+  const match = val.match(/^(\d+(?:\.\d+)?)\s*mm/i);
+  if (match) {
+    const mm = parseFloat(match[1]);
+    if (mm === 0) return 'zero';
+    if (mm <= 5) return 'low';
+    return 'standard';
+  }
+  return val; // legacy text labels pass through unchanged
+}
+
 const EMPTY_FILTERS = {
   search: '', category: '',
   useCase: [], cushionLevel: [], stabilityLevel: [], widthOptions: [], heelDrop: [],
@@ -88,7 +100,7 @@ export default function BrowsePanel({ shoes, categories, scanProfile, educationT
         if (!filters.widthOptions.some(w => ws.includes(w))) return false;
       }
       if (filters.heelDrop.length) {
-        if (!s.heel_drop || !filters.heelDrop.includes(s.heel_drop)) return false;
+        if (!filters.heelDrop.includes(dropCategory(s.heel_drop))) return false;
       }
       return true;
     });
