@@ -122,11 +122,9 @@ export default function ShoeCard({ shoe, score, activeCategory, educationTips, f
             )}
             {foamResponsive && !editMode && <span className="foam-badge" title="Responsive foam">⚡</span>}
           </div>
-          {(foamScore || foamResponsive) && (
+          {foamScore && (
             <div className="foam-meta">
-              {foamScore && <span className="foam-label">{FOAM_LABELS[foamScore]}</span>}
-              {foamResponsive && foamScore && <span className="foam-sep">·</span>}
-              {foamResponsive && <span className="foam-label">Responsive</span>}
+              <span className="foam-label">{FOAM_LABELS[foamScore]}</span>
             </div>
           )}
           {editMode && (
